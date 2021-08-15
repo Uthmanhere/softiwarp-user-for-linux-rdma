@@ -234,6 +234,8 @@ static int ucma_getaddrinfo(const char *node, const char *service,
 	return ret;
 }
 
+#include <arpa/inet.h>
+
 int rdma_getaddrinfo(const char *node, const char *service,
 		     const struct rdma_addrinfo *hints,
 		     struct rdma_addrinfo **res)
@@ -281,6 +283,10 @@ int rdma_getaddrinfo(const char *node, const char *service,
 		ucma_ib_resolve(&rai, hints);
 
 	*res = rai;
+	
+	// fix for TOE
+	((struct sockaddr_in *)((*res)->ai_src_addr))->sin_addr.s_addr = inet_addr("127.0.0.1");
+
 	return 0;
 
 err:
